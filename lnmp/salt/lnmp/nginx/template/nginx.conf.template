@@ -1,0 +1,59 @@
+user  {{USER}};
+worker_processes  1;
+worker_rlimit_nofile 65535;
+
+error_log  {{LOG_PATH}}/error.log;
+pid        {{PID_FILE}};
+
+events {
+    use epoll;
+    worker_connections  1024;
+}
+
+
+http {
+    include       mime.types;
+    default_type  application/octet-stream;
+
+    log_format  main  '$remote_addr - $remote_user [$time_local] "$request" '
+                      '$status $body_bytes_sent "$http_referer" '
+                      '"$http_user_agent" "$http_x_forwarded_for"';
+
+    access_log  {{LOG_PATH}}/access.log  main;
+    sendfile        on;
+    tcp_nopush     on;
+
+    keepalive_timeout  65;
+    gzip         on;
+    gzip_comp_level 6;
+    gzip_min_length 2048;
+    gzip_types text/plain text/css text/xml application/x-javascript application/xml application/json application/java-script
+    gzip_vary on;
+    gzip_disable msie6;
+
+    client_header_buffer_size 128k;
+    large_client_header_buffers 4 128k;
+
+    client_body_buffer_size 16K;
+    client_body_temp_path /var/cache/nginx/client_temp 1 2;
+
+    server {
+        listen       80;
+        server_name  localhost;
+
+        charset utf-8;
+
+        location / {
+            root   html;
+            index  index.html index.htm;
+        }
+
+        error_page  404              /404.html;
+
+        error_page   500 502 503 504  /50x.html;
+        location = /50x.html {
+            root   html;
+        }
+
+    }
+}

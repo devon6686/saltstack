@@ -1,0 +1,3 @@
+dev:
+  '*':
+    - lnmp.basic
